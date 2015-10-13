@@ -3,7 +3,10 @@ Swift语言文章中文版翻译（SwiftGG翻译组）
 
 ## 列表
 
-* Cryptography in Swift with CommonCrypto [2015-08-29](http://img-storage.qiniudn.com/15-8-23/34909577.jpg)
+* Cryptography in Swift with CommonCrypto [2015-08-29]
+
+* templates in xcode 6[2015-09-13]
+
 
 ## 关于
 
