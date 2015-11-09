@@ -7,7 +7,7 @@ Swift语言文章中文版翻译（SwiftGG翻译组）
 
 * templates in xcode 6[2015-09-13]
 
-* capturing_context[2015-10-16]
+* capturing context[2015-11-06]
 
 ## 关于
 
