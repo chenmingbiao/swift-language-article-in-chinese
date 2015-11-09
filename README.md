@@ -1,13 +1,14 @@
 # swift-language-article-in-chinese
 Swift语言文章中文版翻译（SwiftGG翻译组）
+[SwiftGG网站](http://swift.gg/)
 
 ## 列表
 
 * Cryptography in Swift with CommonCrypto [2015-08-29]
 
-* templates in xcode 6[2015-09-13]
+* Templates in Xcode 6[2015-09-13]
 
-* capturing context[2015-11-06]
+* Capturing Context[2015-11-06]
 
 ## 关于
 

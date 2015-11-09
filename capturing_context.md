@@ -46,7 +46,7 @@ public struct Error: ErrorType {
 }
 ```
 
-我对这种额外添加类型参数的方式感到深深讨厌。这种方法只是简化了错误的产生。
+我很不喜欢这种额外添加类型参数的方式。这种方法只是简化了错误的产生。
 
 ```swift
 public struct Parent {
@@ -83,7 +83,7 @@ public struct Parent: Contextualizable {
         throw Error(currentContext(), "An important reason")}
 ```
 
-修改了输出结果的句子后，原始类型也包含在字符中进行输出。
+更新了输出结果的句子后，原始类型也包含在字符中进行输出。
 
 正如读者 `Kametrixom` 所指出的，你还可以继承 `Contextualizable` 类去创建一个属于你自己的错误类型。（他还写了一个非常好的错误类型，这种错误类型可以随意添加到程序中。）`Kametrixom` 所写的错误类型如下图所示：
 
