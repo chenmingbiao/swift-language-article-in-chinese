@@ -1,5 +1,5 @@
-title: 捕获上下文
-date: 2015-10-14
+title: 捕获语境
+date: 2015-11-09
 tags: [Swift]
 categories: [ericasadun]
 permalink: capturing_context
@@ -8,18 +8,15 @@ permalink: capturing_context
 > 原文链接: [Capturing context](http://ericasadun.com/2015/08/27/capturing-context-swiftlang/)
 > 原文日期: 2015/08/27
 
-> 译者：[chenmingbiao](https://github.com/chenmingbiao)
+> 译者：[CMB](https://github.com/chenmingbiao)
 > 校对：[xxx](xxx)
 > 审核：[xxx](xxx)
 
-#捕获上下文
+#捕获语境
 
 ---
 
-
-假设你正在使用一个类型，当有错误时发生时你想要抛出冲突在文中出现的位置，你可以做到这一点，主要是使用一些内置的编译器关键字：`__FUNCTION__` ， `__LINE__` 和 `__FILE__` ，这些关键词提供文字插值有关调用函数的详细信息
-
-Say you’re working with a type and you want to throw an error that reflects the context of where it originates. You can do that, mostly, using a few built-in compiler keywords. __FUNCTION__, __LINE__, and __FILE__ provide literal interpolation about the details of a calling function:
+假设你正在使用一个类型，当有错误时发生时你想要抛出冲突在文中出现的位置，主要是通过使用一些内置的编译器关键字：`__FUNCTION__` ， `__LINE__` 和 `__FILE__` ，这些关键词提供了有关函数调用详细的文本插值：
 
 ```swift
 public struct Error: ErrorType {
@@ -31,13 +28,11 @@ public struct Error: ErrorType {
 }
 ```
 
-一行典型的错误输出提示就像这个例子一样:
+一行典型的 `Error` 输出提示就跟这个例子一样:
 
 > Error(source: "myFunction():<EXPR>:14", reason: "An important reason")
 
-虽然这种结构使你能够捕获错误的函数名，文件名和行序，但你无法捕捉没有类型参数的原始父类型。抓取该类型，扩展 `Error` 初始化为包括“源类型”，和从构造传递 `self.dynamicType` 。
-
-While this struct enables you to capture the error’s function, file, and line, you can’t capture the originating parent type without a type parameter. To fetch that type, extend the Error initializer to include a “source type”, and pass self.dynamicType from the constructor.
+虽然这种结构使你能够捕获错误的函数，文件和行序，但你无法捕捉没有类型参数的原始父类型。为了抓取该类型的，需要在 `Error` 结构体构造器中带上“源类型”的参数，还有需要从构造器中传递 `self.dynamicType` 参数。
 
 ```swift
 public struct Error: ErrorType {
@@ -51,10 +46,7 @@ public struct Error: ErrorType {
 }
 ```
 
-我找了额外的类型参数深深讨厌。这种方法的整个点是简化误差生成。
-
-I find the extra type parameter deeply annoying. The entire point of this approach is to simplify error generation.
-
+我对这种额外添加类型参数的方式感到深深讨厌。这种方法只是简化了错误的产生。
 
 ```swift
 public struct Parent {
@@ -66,9 +58,7 @@ do {try Parent().myFunction()} catch{print(error)}
 // Error(source: "myFunction():<EXPR>:14:Parent", reason: "An important reason")
 ```
 
-使用协议自动拿起型环境。在以下 `Contextualizable` 分机默认实现指 `self.dynamicType` 的方式，方法签名不能。
-
-Use a protocol to automatically pick up on type context. The default implementation in the following Contextualizable extension refers to self.dynamicType in a way that a method signature cannot.
+使用一个协议来自动选择语境类型。将以一种默认引用 `self.dynamicType` 的 `Contextualizable` 扩展方式来实现，这种方式用在方法签名是不可行的。
 
 ```swift
 protocol Contextualizable {}
@@ -79,9 +69,7 @@ extension Contextualizable {
 }
 ```
 
-结合的方法，可以简化整个事情。共享错误类型简化为简单的让和环境责任的错误初始化移动到符合要求的类型，自动继承 `currentContext` 方法。
-
-Combining approaches enables you to simplify the whole shebang. The shared Error type reduces to simple lets and context responsibility moves from the Error initializer to a conforming type, automatically inheriting the currentContext method.
+结合两种方法可以简化整个工作。共享 `Error` 类型可以减少一些常亮的定义，并且合理地把 `Error` 构造器移至一个符合的类型当中，这种类型自动继承了 `currentContext` 方法。
 
 ```swift
 public struct Error: ErrorType {
@@ -95,21 +83,8 @@ public struct Parent: Contextualizable {
         throw Error(currentContext(), "An important reason")}
 ```
 
-更新后的结果现在包括在字符串输出原始类型。
+修改了输出结果的句子后，原始类型也包含在字符中进行输出。
 
-The updated results now includes the originating type in the string output.
+正如读者 `Kametrixom` 所指出的，你还可以继承 `Contextualizable` 类去创建一个属于你自己的错误类型。（他还写了一个非常好的错误类型，这种错误类型可以随意添加到程序中。）`Kametrixom` 所写的错误类型如下图所示：
 
-正如读者 `Kametrixom` 所指出的，你还可以扩展 `Contextualizable` 代表您构建一个错误。 （他还写了选择性增加方面一个非常好的错误类型。）
-
-As reader Kametrixom points out,  you can also extend Contextualizable to construct an error on your behalf. (He’s also written a really nice error type that optionally adds context.)
-
->	@ericasadun How about this? pic.twitter.com/1ijQD5uN3j
-
->	— Kametrixom (@Kametrixom) August 27, 2015
-
-这里有一个链接到一个要点，我已经抛出了一些这方面的在一起。
-
-Here’s a link to a gist where I’ve thrown up some of this all together.
-
-
-
+![](http://img-storage.qiniudn.com/15-11-9/61176604.jpg)
