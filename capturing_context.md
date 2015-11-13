@@ -1,5 +1,5 @@
 title: "捕获上下文信息"
-date: 2015-11-09 09:00:00
+date: TODO
 tags: [Erica Sadun]
 categories: [Swift 进阶]
 permalink: capturing_context
@@ -10,12 +10,13 @@ permalink: capturing_context
 原文日期=2015/08/27
 译者=CMB
 校对=numbbbbb
-定稿=
+定稿=千叶知风
 发布时间=
 
+<!--此处开始正文-->
 
 假设你正在使用一个类型，当有错误时发生时你想要输出异常发生时的上下文。通常你会使用一些内置的编译器关键字：`__FUNCTION__` ， `__LINE__` 和 `__FILE__` ，这些关键词提供了有关函数调用详细的文本插值：
-
+<!--more-->
 ```swift
 public struct Error: ErrorType {
     let source: String; let reason: String
@@ -28,11 +29,11 @@ public struct Error: ErrorType {
 
 一行典型的 `Error` 输出如下所示:
 
-```
+```swift
 Error(source: "myFunction():<EXPR>:14", reason: "An important reason")
 ```
 
-虽然这种结构能够捕获出现异常的函数、文件和行号，但你无法捕捉没有类型参数的原始父类型。为了捕获该类型，需要在 `Error` 结构体构造器中包含“原始类型”，并向构造器中传递 `self.dynamicType` 参数。
+虽然这种结构能够让你捕获出现异常的函数、文件和行号，但你无法捕捉没有类型参数的原始父类型。为了捕获该类型，需要在 `Error` 结构体构造器中包含“原始类型”，并向构造器中传递 `self.dynamicType` 参数。
 
 ```swift
 public struct Error: ErrorType {
@@ -69,7 +70,7 @@ extension Contextualizable {
 }
 ```
 
-结合上述两种方法可以轻松实现我们的目标。共享 `Error` 类型之后就可以把变量改成常量，并且把上下文相关代码从 `Error` 构造器移动到遵循协议的类型中，这样就可以自动继承 `currentContext` 方法。
+结合上述两种方法可以简化整个过程轻松实现我们的目标。共享 `Error` 类型之后就可以把变量改成常量，并且把上下文相关代码从 `Error` 构造器移动到遵循协议的类型中，这样就可以自动继承 `currentContext` 方法。
 
 ```swift
 public struct Error: ErrorType {
