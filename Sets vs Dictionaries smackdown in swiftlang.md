@@ -17,11 +17,11 @@ permalink: Sets_vs_Dictionaries_smackdown_in_swiftlang
 
 Traditional Cocoa has a bad dictionary habit. From user info to font options to AV settings, NSDictionary has long acted as the Cocoa workhorse for passing data. Dictionaries are flexible, easy to use, and a minefield of potential disasters.
 
-传统的可可有一个坏习惯的字典。从用户信息到字体选项AV设置，NSDictionary中一直担任主力可可传递数据。字典是灵活的，易于使用，和潜在的灾难的雷区。
+传统的 `Cocoa` 有一个坏的字典习惯。从用户信息到字体选项AV设置， `NSDictionary` 一直担任 `Cocoa` 传递数据的角色。字典是灵活的，易用的，但它也是一个深水炸弹。
 
 In this post, I’m going to discuss an alternative approach, one that’s far more Swift-y. It’s not yet a completely turn-key solution but I think its one that showcases a much better mindset for how APIs should be working in a post-Swift world.
 
-在这篇文章中，我将讨论另一种方法，一个是更雨燕-Y。这还不是一个完全交钥匙解决方案，但我认为它的一个展示如何API应该在后雨燕的世界是工作一个更好的心态。
+在这篇文章中，我将讨论另一种更快捷的方法。这还不是一个完全交钥匙解决方案，但我认为它的一个展示如何API应该在后雨燕的世界是工作一个更好的心态。
 
 ###Working with Dictionary-based Settings
 
