@@ -1,6 +1,6 @@
 title: "在Swift语言中集合与字典的角逐"
 date: TODO
-tags: [Erica Sadun]
+tags: [ ]
 categories: [Swift 进阶]
 permalink: Sets_vs_Dictionaries_smackdown_in_swiftlang
 
@@ -17,19 +17,19 @@ permalink: Sets_vs_Dictionaries_smackdown_in_swiftlang
 
 Traditional Cocoa has a bad dictionary habit. From user info to font options to AV settings, NSDictionary has long acted as the Cocoa workhorse for passing data. Dictionaries are flexible, easy to use, and a minefield of potential disasters.
 
-传统的 `Cocoa` 有一个坏的字典习惯。从用户信息到字体选项AV设置， `NSDictionary` 一直担任 `Cocoa` 传递数据的角色。字典是灵活的，易用的，但它也是一个深水炸弹。
+传统的 `Cocoa` 在使用字典时有个不好的习惯。从用户信息到字体选项AV设置， `NSDictionary` 一直担任 `Cocoa` 传递数据的角色。字典是灵活的，易用的，但它也是一个潜在的危机。
 
-In this post, I’m going to discuss an alternative approach, one that’s far more Swift-y. It’s not yet a completely turn-key solution but I think its one that showcases a much better mindset for how APIs should be working in a post-Swift world.
+--> In this post, I’m going to discuss an alternative approach, one that’s far more Swift-y. It’s not yet a completely turn-key solution but I think its one that showcases a much better mindset for how APIs should be working in a post-Swift world.
 
-在这篇文章中，我将讨论另一种更快捷的方法。这还不是一个完全交钥匙解决方案，但我认为它的一个展示如何API应该在后雨燕的世界是工作一个更好的心态。
+--> 在这篇文章中，我将讨论另一种更快捷的方法。这不是一站式( `turn-key` )的解决方案，但我认为它的一个展示如何API应该在后 `Swift` 的世界是工作一个更好的心态。
 
 ###Working with Dictionary-based Settings
 
-###与基于字典的环境中工作
+###使用基于字典的设置
 
 Here is some code I pulled out of a random project of mine. (If you’re familiar with my other writings, it’s from my Movie Maker class.) This Objective-C code builds an option dictionary, which is used to construct a AV pixel buffer:
 
-下面是一些代码，我拿出我的一个随机的项目。 （如果你熟悉我的其他作品，这是从我的电影制作类）。这Objective-C代码生成选项的字典，它是用来构建一个AV像素缓冲区：
+下面的代码是随机从我自己项目中抽取出来的。 （如果你熟悉我其他的作品或许你会有印象，这是我写的电影制作类）。这几行 `Objective-C` 代码是创建一个名为 `options` 的字典，它是用来构建一个AV像素的缓冲区：
 
 ```swift
  NSDictionary *options = @{
@@ -42,7 +42,7 @@ Here is some code I pulled out of a random project of mine. (If you’re familia
 
 This example casts the option keys to (id) and uses Objective-C literal notation to transform Booleans to NSNumber instances. The Swift version of this is much simpler. The compiler is smart enough to associate  values with the declared dictionary type.
 
-这个例子铸选项键（ID），并使用Objective-C的文字符号转换为布尔值的NSNumber实例。这样做的夫特版本要简单得多。编译器是足够聪明的价值观与声明的字典类型相关联。
+这个例子键(`key`)默认为 `(id)` 类型， 并且使用 `Objective-C` 的字面量将布尔类型的值转换为 `NSNumber` 类型。 这种方式在 `Swift` 中使用起来更加简便了。 编译器已经足够智能去把字典中值和类型关联起来(类似脚本语言，赋予值后就会自动声明为该值的类型)。
 
 ```swift
 let myOptions: [NSString: NSObject] = [
@@ -53,59 +53,59 @@ let myOptions: [NSString: NSObject] = [
 
 Even in Swift, this is far from an ideal way to pass values to APIs.
 
-即使在Swift，这是很不理想的方式来传递值的API。
+即使在 `Swift` 中， 将值传递给 `APIs` 也是一种很不理想的方式 。
 
 ###Characteristics of Setting Dictionaries
 
-###设置词典的特点
+###设置字典的特性
 
 Settings dictionaries like the examples you just saw exhibit common characteristics, which are worth examining carefully.
 
+下面的列子中展示了设置字典的基础特性，这些特性都是值得仔细研究的。
+
  * They have a fixed set of legal keys. There are about a dozen legal pixel buffer attribute keys in AVFoundation. This collection rarely  changes and those keys are tied to a well-established task.
+
+ * 他们有一套固定合法的键(`key`)，大概有12个合法的像素缓冲区属性的键在AVFoundation库里。这个集合里面的键(`key`)很少会被改变，而是用于绑定到一个成熟的任务中。
  
  * The requested values associated with each key instance are of known types. These types are more nuanced than just NSObject, for example “The number of pixels padding the right of the image (type CFNumber).”
+
+ * 与每个键实例关联请求的值是已知的类型。这些类型不仅仅是NSObject的更细致，例如“像素填充图像（类型CFNumber）的权数。”
  
  * Type safety does matter for the passed values, even though this cannot be enforced through an NSDictionary. Both compatibility keys in the preceding example should be Boolean, not Int or String or Array or even NSNumber.
+
+ * 类型的安全关系着值的传递，尽管无法通过一个 `NSDictionary`  就可以执行值的传递。 前面的例子因为考虑了兼容性，所以键的类型应该是 `Boolean` ，而不是 `Int` 或 `String` 或 `Array`，甚至 `NSNumber` 类型。
  
  * Valid entries appears just once in the dictionary, as keys are hashed and new entries overwrite older ones.
 
+ * 有效条目在字典中出现一次就好，因为键是散列的而且新条目将覆盖旧条目。
+
 In Swift, the characteristics in the above bullets list are far more typical of sets and enumerations than dictionaries. Here are some reasons why.
 
+在 `Swift` 中，上述列出的特性在集合和枚举中显得比字典更加典型。理由如下：
+
  * An enumeration expresses a full range of possible options for a given type. Most Cocoa APIs similar to this example have fixed, unchanging keys.
+
+ * 枚举列出了所有给定类型的可能选项。大多数 `Cocoa APIs` 类似于这个例子有固定的，不变的键。
  
  * Enumerations enable you to associate typed values with individual cases. Cocoa APIs document the types they expect to be passed for each key.
+
+ * 枚举使你在个别情况下可以关联键和值。 `Cocoa APIs` 文档表明，他们希望传递的每个键的类型。
  
  * Like dictionaries, sets restrict membership to avoid multiple instances.
 
+ * 如字典，集合中有成员限制，以避免多个实例产生。
+
 For these reasons, I think these settings collections are better expressed in Swift as sets of enumerations instead of an [NSString: NSObject] dictionary.
 
-设置字典一样的例子，你刚才看到具有共同的特点，这是值得仔细研究。
-
- *他们有固定的一套法律钥匙。有关于AVFoundation十几法律像素缓冲区属性键。这个集合很少改变那些键被绑定到一个完善的任务。
- 
- *与每个键实例关联的请求的值是已知的类型。这些类型不仅仅是NSObject的更细致，例如“像素填充图像（类型CFNumber）的权数。”
- 
- *类型的安全关系了传递的值，尽管这无法通过一个NSDictionary执行。前面的例子在兼容的键应该是布尔值，而不是int或字符串或数组，甚至NSNumber的。
- 
- *有效条目在字典中出现一次就好，因为密钥散列和新条目将覆盖旧的。
-
-在夫特，在上述列表中的子弹的特性是更加典型的套和枚举比字典。这里有一些原因。
-
- *枚举表达了全方位的给定类型的可能选项。大多数Cocoa API的类似于这样的例子有固定的，不变的钥匙。
- 
- *枚举使您可以键入值与个别案例关联。可可的API文档，他们希望传递的每个键的类型。
- 
- *如字典，组成员资格限制，以避免多个实例。
-
-基于这些原因，我觉得这些设置的集合在斯威夫特更好的表现为集枚举，而不是[的NSString：NSObject的]的字典。
+基于这些原因，我觉得在 `Swift` 中设置集合使用枚举比 `NSString: NSObject]` 的字典表达的效果更加好。
 
 ###Transitioning from Keys
 
-###从按键过渡
+###键的转换
 
 Stepping back a second, consider the current state of the art. AVFoundation defines a series of keys like the following. (This is not a complete set of the pixel buffer keys, by the way)
 
-退一步第二，考虑在本领域的当前状态。 AVFoundation定义了一系列类似以下键。 （这并不是一个完整的像素缓冲器键的方式）
+退一步，考虑在本领域的当前状态。 AVFoundation定义了一系列类似以下键。 （这并不是一个完整的像素缓冲器键的方式）
 
 ```swift
 const CFStringRef kCVPixelBufferPixelFormatTypeKey;
