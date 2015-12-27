@@ -15,23 +15,15 @@ permalink: Sets_vs_Dictionaries_smackdown_in_swiftlang
 
 <!--此处开始正文-->
 
-Traditional Cocoa has a bad dictionary habit. From user info to font options to AV settings, NSDictionary has long acted as the Cocoa workhorse for passing data. Dictionaries are flexible, easy to use, and a minefield of potential disasters.
+传统的 `Cocoa` 在使用字典时有个不好的习惯。从用户信息到字体选项再到视频流(`AV`)设置，`NSDictionary` 一直担任 `Cocoa` 传递数据的角色。字典是灵活的，易用的，但它也是一个潜在的危机。
 
-传统的 `Cocoa` 在使用字典时有个不好的习惯。从用户信息到字体选项AV设置， `NSDictionary` 一直担任 `Cocoa` 传递数据的角色。字典是灵活的，易用的，但它也是一个潜在的危机。
+在这篇文章中，我将讨论另一种更快捷的方法。这不是一站式( `turn-key` )的解决方法，但我认为它的一个更好展示应用程序接口(下文中统一简称为 `APIs` )如何在快速发展的 `Swift` 时代的工作思维倾向。
 
---> In this post, I’m going to discuss an alternative approach, one that’s far more Swift-y. It’s not yet a completely turn-key solution but I think its one that showcases a much better mindset for how APIs should be working in a post-Swift world.
+###基于字典的设置工作
 
---> 在这篇文章中，我将讨论另一种更快捷的方法。这不是一站式( `turn-key` )的解决方案，但我认为它的一个展示如何API应该在后 `Swift` 的世界是工作一个更好的心态。
+下面的代码是随机从我自己项目中抽取出来的。(如果你熟悉我其他的作品或许你会有印象，这是我写的电影制作类)。这几行 `Objective-C` 代码是创建一个名为 `options` 的字典，它是用来构建一个视频流(`AV`)像素缓冲区：
 
-###Working with Dictionary-based Settings
-
-###使用基于字典的设置
-
-Here is some code I pulled out of a random project of mine. (If you’re familiar with my other writings, it’s from my Movie Maker class.) This Objective-C code builds an option dictionary, which is used to construct a AV pixel buffer:
-
-下面的代码是随机从我自己项目中抽取出来的。 （如果你熟悉我其他的作品或许你会有印象，这是我写的电影制作类）。这几行 `Objective-C` 代码是创建一个名为 `options` 的字典，它是用来构建一个AV像素的缓冲区：
-
-```swift
+```Objective-C
  NSDictionary *options = @{
     (id) kCVPixelBufferCGImageCompatibilityKey : 
         @YES,
@@ -40,9 +32,7 @@ Here is some code I pulled out of a random project of mine. (If you’re familia
  };
 ```
 
-This example casts the option keys to (id) and uses Objective-C literal notation to transform Booleans to NSNumber instances. The Swift version of this is much simpler. The compiler is smart enough to associate  values with the declared dictionary type.
-
-这个例子键(`key`)默认为 `(id)` 类型， 并且使用 `Objective-C` 的字面量将布尔类型的值转换为 `NSNumber` 类型。 这种方式在 `Swift` 中使用起来更加简便了。 编译器已经足够智能去把字典中值和类型关联起来(类似脚本语言，赋予值后就会自动声明为该值的类型)。
+这个例子中键(`key`)默认为 `(id)` 类型， 并且使用 `Objective-C` 字面量的方式将布尔类型(`Booleans`)的值转换为 `NSNumber` 类型。这种操作在 `Swift` 中使用起来更加简便。编译器已经足够智能去把字典中值和类型关联起来(类似脚本语言，赋予值后就会自动声明为该值的类型)。
 
 ```swift
 let myOptions: [NSString: NSObject] = [
@@ -51,21 +41,15 @@ let myOptions: [NSString: NSObject] = [
 ]
 ```
 
-Even in Swift, this is far from an ideal way to pass values to APIs.
-
-即使在 `Swift` 中， 将值传递给 `APIs` 也是一种很不理想的方式 。
-
-###Characteristics of Setting Dictionaries
+即使在 `Swift` 中，将值传递给 `APIs` 也是一种很不理想的方式 。
 
 ###设置字典的特性
-
-Settings dictionaries like the examples you just saw exhibit common characteristics, which are worth examining carefully.
 
 下面的列子中展示了设置字典的基础特性，这些特性都是值得仔细研究的。
 
  * They have a fixed set of legal keys. There are about a dozen legal pixel buffer attribute keys in AVFoundation. This collection rarely  changes and those keys are tied to a well-established task.
 
- * 他们有一套固定合法的键(`key`)，大概有12个合法的像素缓冲区属性的键在AVFoundation库里。这个集合里面的键(`key`)很少会被改变，而是用于绑定到一个成熟的任务中。
+ * 他们有一套固定合法的键(`key`)，大概有12个合法的像素缓冲区属性的键在 `AVFoundation` 库里。这个集合里面的键(`key`)很少会被改变，而是用于绑定到一个成熟的任务中。
  
  * The requested values associated with each key instance are of known types. These types are more nuanced than just NSObject, for example “The number of pixels padding the right of the image (type CFNumber).”
 
@@ -97,15 +81,11 @@ In Swift, the characteristics in the above bullets list are far more typical of 
 
 For these reasons, I think these settings collections are better expressed in Swift as sets of enumerations instead of an [NSString: NSObject] dictionary.
 
-基于这些原因，我觉得在 `Swift` 中设置集合使用枚举比 `NSString: NSObject]` 的字典表达的效果更加好。
-
-###Transitioning from Keys
+基于这些原因，我觉得在 `Swift` 中设置集合使用枚举比 `[NSString: NSObject]` 的字典表达的效果更加好。
 
 ###键的转换
 
-Stepping back a second, consider the current state of the art. AVFoundation defines a series of keys like the following. (This is not a complete set of the pixel buffer keys, by the way)
-
-退一步，考虑在本领域的当前状态。 AVFoundation定义了一系列类似以下键。 （这并不是一个完整的像素缓冲器键的方式）
+退一步考虑现在最先进的技术。`AVFoundation` 定义了一系列的键，如下所示。 （这并不是一个完整像素缓冲器的键，只显示了一部分）
 
 ```swift
 const CFStringRef kCVPixelBufferPixelFormatTypeKey;
@@ -116,13 +96,9 @@ const CFStringRef kCVPixelBufferCGImageCompatibilityKey;
 const CFStringRef
 ```
 
-Each of these items is a  constant string and each string is used to index dictionaries. Callers build dictionaries using these keys, passing arbitrary objects as values.
+上面都是一些常量字符串，这些字符串都被用于作为字典的索引。调用者通过使用这些键来创建字典，通过键作为值传递任意对象。
 
-所有这些项目是一个常量字符串，每个字符串被用于索引字典。来电者使用这些按键，通过任意对象作为值构建词典。
-
-In Swift, you can re-architect this key-based system into a simple enumeration, specifying the valid type associated with each key case. Here’s what this looks like for the five cases listed above. The  associated types are pulled from the existing pixel buffer attribute key docs.
-
-在Swift，你可以重新设计该键为基础的系统进入了一个简单枚举，指定与每个键的情况下相关的有效的类型。以下是这看起来像上面列出的五个案件。相关的类型从现有的像素缓冲区拉属性关键文档。
+在 `Swift` 中，你可以重新设计该基于密匙(`key-based`)的系统为一个简单的枚举，为每个键都关联指定的有效类型。下面的枚举就如上面一样。相关的类型来自现有的像素缓冲区属性文档。
 
 ```swift
 enum CVPixelBufferOptions {
@@ -135,21 +111,15 @@ enum CVPixelBufferOptions {
 }
 ```
 
-Re-designing options this way produces an extensible enumeration with strict value typing for each possible case. This approach offers you a major type safety victory compared to weak dictionary typing.
-
-重新设计的选择这种方式会产生一种可扩展的枚举严格的价值类型为每个可能的情况下。这种方法为您提供比较弱词典打字的主要类型安全的胜利。
+重新设计 `options` 为一个可扩展的枚举，每个可能的情况下，严格规定值的类型。这种方法为你提供了一个主要的类型，这种类型相比起 `weak ` 字典类型要显得安全。
 
 In addition, the individual enumeration cases are also clearer, more succinct, and communicate use better than exhaustively long Cocoa constants. Compare these cases with, for example,  kCVPixelBufferCGBitmapContextCompatibilityKey. The Cocoa names take responsibility for mentioning their use as a constant (k), their related class (CVPixelBuffer), and their usage role (key), all of which can be dropped here.
 
-此外，个别枚举箱子也更清晰，更简洁，与通信使用比详尽长可可常量更好。比较这些情况下与例如，kCVPixelBufferCGBitmapContextCompatibilityKey。可可名称承担责任，提到自己作为一个常数（k）的使用，其相关的类（CVPixelBuffer）中，其使用的角色（密钥），所有这一切都可以在这里删除。
+此外，个别枚举情况也更清晰，更简洁，与通信使用比详尽长 `Cocoa` 常量更好。比较这些情况下与例如 `kCVPixelBufferCGBitmapContextCompatibilityKey`。`Cocoa` 称承担责任，提到自己作为一个常数（k）的使用，其相关的类（`CVPixelBuffer`）中，其使用的角色（`key`），所有这一切都可以在这里删除。
 
-###Building Settings Collections
+###创建集合的设置
 
-###大厦设置的集合
-
-With this redesign, your call constructing a set should look like the following example. I say should because this example will not yet compile.
-
-有了这个重新设计，您的通话构建了一套看起来应该像下面的例子。我说应该，因为这个例子没有编译。
+通过重新设计，你可以通过调用去创建一个集合，这个集合就如下面的例子。我想说的是下面的例子还没被编译的。
 
 ```swift
 // This does not compile yet
@@ -158,9 +128,7 @@ let bufferOptions: Set<CVPixelBufferOptions> =
      .CGBitmapContextCompatibility(true)]
 ```
 
-Swift cannot compile this because the CVPixelBufferOptions options are not yet Hashable. At this point, all you can build is an array, which does not guarantee unique membership:
-
-斯威夫特不能编译这一点，因为CVPixelBufferOptions选项尚未哈希。在这一点上，你可以建立是一个数组，这并不能保证唯一成员：
+`Swift` 不能编译以上的代码，因为 `CVPixelBufferOptions` 的 `options` 还不是遵循 `Hashable` 协议。为了解决这个问题，你可以建立一个数组，但是需要注意的是这个数组要满足不能只有唯一成员属性的条件：
 
 ```swift
 // This compiles
@@ -169,21 +137,19 @@ let bufferOptions: [CVPixelBufferOptions] =
      .CGBitmapContextCompatibility(true)]
 ```
 
-Arrays are all well and lovely but they lack the unique options feature that dictionaries offer and that is driving this redesign.
-
-数组都好可爱，但他们缺乏独特的选项功能，词典提供，并正在推动这一重新设计。
+数组使用起来是十分友好的，但它却少了独特 `options` 的功能，但是字典是有提供这个功能的，因为这个功能，所以正在推动重新设计数组。
 
 ###Differentiating Values
 
-###鉴别价值
+###区分值
 
 The Hashable protocol enables Swift to differentiate instances which are basically the same thing from instances which are different things. Both sets and dictionaries use hashing to ensure that members and keys are unique. Without hashing, they cannot provide these assurances.
 
-该哈希协议使雨燕区分情况下它们基本上是从实例这是不同的东西同样的事情。这两套和字典使用散列，以确保成员和钥匙都是独一无二的。如果没有哈希，他们不能提供这些保证。
+--> `Hashable` 协议使 `Swift` 区分实例它们基本上是从实例这是不同的东西同样的事情。集合和字典都使用哈希，以确保成员和键都是唯一的。如果没有哈希，他们不能提供这些保证。
 
 When establishing settings collections, you want to build sets that won’t construct an example like the following, where multiple members with conflicting settings are present at the same time:
 
-在建立设置的集合，要打造集不会构成类似以下内容，其中多个成员与冲突的设置都存在在同一时间的一个例子：
+当创建设置集合时，你希望创建集合，但是这个集合不会构建成一个类似于下面的示例，其中有冲突设置的多个成员同时存在：：
 
 ```swift
 [.CGImageCompatibility(true),
@@ -192,11 +158,11 @@ When establishing settings collections, you want to build sets that won’t cons
 
 These are clearly two distinct enumeration instances due to the different associated values. In this example, you’ll want a set to discard all identical options that follow the first member added to the set, leaving just the “true” case. (Dictionaries follow the opposite rule. Subsequent additions replace existing members instead of being discarded.)
 
-这些显然是由于不同的相关值两个不同的枚举实例。在这个例子中，你需要一组丢弃遵循的第一个成员添加到组，只留下了“真实”情况下，所有相同的选项。 （字典遵循相反的规则。随后补充更换，而不是被丢弃现有的成员。）
+这显然是两个不同的枚举实例由于有不同的相关值。在这个例子中，你需要一个集合丢弃遵循的第一个成员添加到集合，只留下了 `“true”` 情况下，所有相同的选项。 （字典遵循相反的规则。字典是替换现有成员，而不是丢弃。）
 
 You achieve this by implementing hashing, which enables you to compare enumeration cases.
 
-通过实施散列，使您能够比较枚举的情况下，你做到这一点。
+通过实现哈希，使你能够比较枚举的情况。
 
 ###Implementing Hash Values
 
@@ -204,24 +170,20 @@ You achieve this by implementing hashing, which enables you to compare enumerati
 
 For this specific use-case, you need to create a hashing function that considers  case and only case, and not associated values. There is currently no native construct in Swift that offers this functionality, so you need to build this on your own.
 
-对于这个特定的用例，你需要创建一个散列函数，考虑的情况下，只有情况下，并没有相关的值。目前，提供这种功能的斯威夫特没有原生结构，所以你需要自己建这个。
+对于这个特定的用例，您需要创建一个哈希函数，该函数只考虑唯一的情况，而不是关联的值。目前在 `Swift` 中没有提供此功能的构造函数，所以你需要自己创建这个构造函数。
 
 Swift’s Hashable protocol conforms to Equatable, so your implementation must address both sets of requirements. For Hashable, you must return a hash value. For Equatable, you must implement ==.
 
-斯威夫特的哈希协议符合Equatable，让您的实现必须解决这两组的要求。对于哈希，你必须返回一个哈希值。对于Equatable，必须实现==。
+ `Swift` 的哈希要确保遵从 `Equatable` 协议，因此，你的实现必须解决两组的要求。对于 `Hashable` 协议，你必须返回一个哈希值。对于 `Equatable` 协议 ，必须实现 `==` 。
 
 ```swift
 public var hashValue: Int { get } // hashable
 public func ==(lhs: Self, rhs: Self) -> Bool // equatable
 ```
 
-Basic enumerations, e.g. enum MyEnum {case A, B, C} provide raw values that tell you which item you’re working with. These are numbered from zero, and are super handy to use. Unfortunately, enumerations with associated values don’t provide raw value support, making this exercise a lot harder than it might otherwise be. So you have to build hash values by hand, which kind of sucks.
+基本枚举，例如枚举 `MyEnum {case A, B, C}` 提供了原始值，这个原始值告诉你哪些项你正在使用。这些值都是从零开始，并都使用起来十分方便。不幸的是，枚举的关联值不提供原始值的支持，使这项工作变得更加困难。所以，你必须亲手建立哈希值。
 
-基本枚举，例如枚举MyEnum{情况下，A，B，C}规定，告诉你哪些项目你正在使用原始值。这些都是从零开始编号，并都超方便的使用。不幸的是，枚举与关联值不提供原始值的支持，使这项工作变得更加困难比它否则可能。所以，你必须建立由专人哈希值，哪一种吮吸。
-
-Here’s an extension of CVPixelBufferOptions, which manually adds hash values for each case. Ugh.
-
-下面是CVPixelBufferOptions的延伸，它增加了手动哈希值的每一种情况。 啊。
+下面是 `CVPixelBufferOptions` 的 `extension ` ，它手动为每一种情况增加哈希值。
 
 ```swift
 extension CVPixelBufferOptions: 
@@ -243,24 +205,20 @@ public func ==(lhs: CVPixelBufferOptions,
 }
 ```
 
-On the (slightly) bright side, these hash values have absolutely no meaning and are never exposed to API consumers, so if you need to stick in extra values, you can do so. That said, this approach is ugly and hacky and feels very un-Swift.
+在（略）光明的一面，这些哈希值绝对没有任何意义而且也不会暴露给 `API` 使用者，所以如果你需要坚持添加额外的值，你可以这样做。这就是说，这种做法是丑陋，而且让人感觉起来非常不方便。
 
-在（略）光明的一面，这些哈希值绝对没有任何意义，不会暴露给API消费者，所以如果你需要额外的价值坚持，你可以这样做。这就是说，这种做法是丑陋，哈克，感觉非常不斯威夫特。
-
-Once you add these features, however, everything starts to work. You can build sets of settings, with the assurance that each setting appears just once and their associated values are well typed.
-
-一旦你添加这些功能，但是，一切都开始工作。你可以打造集的设置，与每个设置出现了一次，并且它们的相关值以及输入的保证。
+一旦你添加这些功能，一切都开始工作。你可以创建集合的设置，来保证每一个集合只出现一次以及它们的值关联的是正确的类型。
 
 ###Final Thoughts
 
-###最后的思考
+###总结
 
 The approach described in this post, clunky hashing support and all, is far better than the Cocoa NSDictionary approach. Type safety, enumerations, and set, all provide a better solution for what otherwise feels like an archaic API dinosaur.
 
-在这篇文章中，笨重的散列支持和全体描述的方法，是远远超过了可可的NSDictionary方法要好。安全型，枚举和设置，都提供了什么，否则感觉就像一个古老的API恐龙一个更好的解决方案。
+在这篇文章中所描述支持笨重哈希的方法，远胜于 `Cocoa` 的 `NSDictionary` 方法。类型安全，枚举和集合都提供了更好的解决方案，否则感觉像一个古老而过时的 `API` 。
 
 What Swift really needs here, though, is something closer to option sets with associated values. At a minimum, adding raw value support to all enumeration cases (not just basic ones that lack associated or intrinsic values) would be a major step forward.
 
-斯威夫特什么真正需要的这里，不过，是更接近于选项集与关联值。至少，将原始值的支持，以列举的所有案件（不只是基本的那些缺乏相关的或内在价值）将是向前迈进一大步。
+我想 `Swift` 真正需要的是选项集合与值能更好的关联在一起。至少，在所有的枚举项中添加原始值的支持（不只是基本的那些缺乏相关的或内在价值）将是向前迈进一大步。
 
 Thanks, Erik Little
