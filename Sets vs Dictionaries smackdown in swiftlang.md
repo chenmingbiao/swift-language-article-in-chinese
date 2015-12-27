@@ -143,24 +143,16 @@ let bufferOptions: [CVPixelBufferOptions] =
 
 ###区分值
 
-The Hashable protocol enables Swift to differentiate instances which are basically the same thing from instances which are different things. Both sets and dictionaries use hashing to ensure that members and keys are unique. Without hashing, they cannot provide these assurances.
+`Hashable` 协议使 `Swift` 可以区分不同的实例。集合和字典都使用了哈希来确保成员和键都是唯一的。如果没有哈希，他们不能提供这些保证。
 
---> `Hashable` 协议使 `Swift` 区分实例它们基本上是从实例这是不同的东西同样的事情。集合和字典都使用哈希，以确保成员和键都是唯一的。如果没有哈希，他们不能提供这些保证。
-
-When establishing settings collections, you want to build sets that won’t construct an example like the following, where multiple members with conflicting settings are present at the same time:
-
-当创建设置集合时，你希望创建集合，但是这个集合不会构建成一个类似于下面的示例，其中有冲突设置的多个成员同时存在：：
+当创建设置集合时，你希望创建集合，但是这个集合不会构建成一个类似于下面的示例，其中有冲突设置的多个成员同时存在：
 
 ```swift
 [.CGImageCompatibility(true),
  .CGImageCompatibility(false)] // which one?!
 ```
 
-These are clearly two distinct enumeration instances due to the different associated values. In this example, you’ll want a set to discard all identical options that follow the first member added to the set, leaving just the “true” case. (Dictionaries follow the opposite rule. Subsequent additions replace existing members instead of being discarded.)
-
 这显然是两个不同的枚举实例由于有不同的相关值。在这个例子中，你需要一个集合丢弃遵循的第一个成员添加到集合，只留下了 `“true”` 情况下，所有相同的选项。 （字典遵循相反的规则。字典是替换现有成员，而不是丢弃。）
-
-You achieve this by implementing hashing, which enables you to compare enumeration cases.
 
 通过实现哈希，使你能够比较枚举的情况。
 
@@ -168,20 +160,17 @@ You achieve this by implementing hashing, which enables you to compare enumerati
 
 ###实现哈希值
 
-For this specific use-case, you need to create a hashing function that considers  case and only case, and not associated values. There is currently no native construct in Swift that offers this functionality, so you need to build this on your own.
 
-对于这个特定的用例，您需要创建一个哈希函数，该函数只考虑唯一的情况，而不是关联的值。目前在 `Swift` 中没有提供此功能的构造函数，所以你需要自己创建这个构造函数。
+对于这个特定的用例，你需要创建一个哈希函数，该函数只考虑唯一的情况，而不是考虑关联值。目前在 `Swift` 中没有提供此功能的构造函数，所以你需要自己创建这个构造函数。
 
-Swift’s Hashable protocol conforms to Equatable, so your implementation must address both sets of requirements. For Hashable, you must return a hash value. For Equatable, you must implement ==.
-
- `Swift` 的哈希要确保遵从 `Equatable` 协议，因此，你的实现必须解决两组的要求。对于 `Hashable` 协议，你必须返回一个哈希值。对于 `Equatable` 协议 ，必须实现 `==` 。
+ `Swift` 的哈希要确保遵从 `Equatable` 协议，因此，你的实现必须解决两组的要求。对于 `Hashable` 协议，你必须返回一个哈希值。对于 `Equatable` 协议 ，必须实现 `==` 函数。
 
 ```swift
 public var hashValue: Int { get } // hashable
 public func ==(lhs: Self, rhs: Self) -> Bool // equatable
 ```
 
-基本枚举，例如枚举 `MyEnum {case A, B, C}` 提供了原始值，这个原始值告诉你哪些项你正在使用。这些值都是从零开始，并都使用起来十分方便。不幸的是，枚举的关联值不提供原始值的支持，使这项工作变得更加困难。所以，你必须亲手建立哈希值。
+基本的枚举，例如 `MyEnum {case A, B, C}` 提供了原始值，这个原始值告诉你哪些项你正在使用。这些值都是从零开始，并都使用起来十分方便。不幸的是，枚举的关联值不提供原始值的支持，使这项工作变得更加困难。所以，你必须亲手建立哈希值。
 
 下面是 `CVPixelBufferOptions` 的 `extension ` ，它手动为每一种情况增加哈希值。
 
@@ -205,19 +194,15 @@ public func ==(lhs: CVPixelBufferOptions,
 }
 ```
 
-在（略）光明的一面，这些哈希值绝对没有任何意义而且也不会暴露给 `API` 使用者，所以如果你需要坚持添加额外的值，你可以这样做。这就是说，这种做法是丑陋，而且让人感觉起来非常不方便。
+从最直观的一面可以看出这些哈希值绝对没有任何意义而且也不会暴露给 `API` 使用者，所以如果你需要坚持添加额外的值，你可以这样做。这就是说，这种做法是丑陋，而且让人感觉起来非常不方便。
 
-一旦你添加这些功能，一切都开始工作。你可以创建集合的设置，来保证每一个集合只出现一次以及它们的值关联的是正确的类型。
+一旦你添加这些功能，一切都将开始工作。你可以创建集合的设置，来保证每一个集合只出现一次以及保证它们的值关联的是正确的类型。
 
 ###Final Thoughts
 
 ###总结
 
-The approach described in this post, clunky hashing support and all, is far better than the Cocoa NSDictionary approach. Type safety, enumerations, and set, all provide a better solution for what otherwise feels like an archaic API dinosaur.
-
-在这篇文章中所描述支持笨重哈希的方法，远胜于 `Cocoa` 的 `NSDictionary` 方法。类型安全，枚举和集合都提供了更好的解决方案，否则感觉像一个古老而过时的 `API` 。
-
-What Swift really needs here, though, is something closer to option sets with associated values. At a minimum, adding raw value support to all enumeration cases (not just basic ones that lack associated or intrinsic values) would be a major step forward.
+在这篇文章中所描述支持笨重哈希的方法远胜于 `Cocoa` 的 `NSDictionary` 方法。类型安全，枚举和集合都提供了更好的解决方案，否则使用起来就像一个古老而过时的 `API` 。
 
 我想 `Swift` 真正需要的是选项集合与值能更好的关联在一起。至少，在所有的枚举项中添加原始值的支持（不只是基本的那些缺乏相关的或内在价值）将是向前迈进一大步。
 
