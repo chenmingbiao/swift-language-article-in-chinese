@@ -17,7 +17,7 @@ permalink: Sets_vs_Dictionaries_smackdown_in_swiftlang
 
 传统的 `Cocoa` 在使用字典时有个不好的习惯。从用户信息到字体选项再到视频流(`AV`)设置，`NSDictionary` 一直担任 `Cocoa` 传递数据的角色。字典是灵活的，易用的，但它也是一个潜在的危机。
 
-在这篇文章中，我将讨论另一种更快捷的方法。这不是一站式( `turn-key` )的解决方法，但我认为它的一个更好展示应用程序接口(下文中统一简称为 `APIs` )如何在快速发展的 `Swift` 时代的工作思维倾向。
+在这篇文章中，我将讨论另一种更快捷的方法。这不是一站式( `turn-key` )的解决方法，但我认为它是一个更好展示应用程序接口(下文中统一简称为 `APIs` )在 `Swift` 快速发展时代的工作思维倾向。
 
 ###基于字典的设置工作
 
@@ -32,7 +32,7 @@ permalink: Sets_vs_Dictionaries_smackdown_in_swiftlang
  };
 ```
 
-这个例子中键(`key`)默认为 `(id)` 类型， 并且使用 `Objective-C` 字面量的方式将布尔类型(`Booleans`)的值转换为 `NSNumber` 类型。这种操作在 `Swift` 中使用起来更加简便。编译器已经足够智能去把字典中值和类型关联起来(类似脚本语言，赋予值后就会自动声明为该值的类型)。
+这个例子中键(`key`)默认为 `(id)` 类型， 并且使用 `Objective-C` 字面量的方式将布尔类型(`Booleans`)的值转换为 `NSNumber` 类型。这种操作在 `Swift` 中使用起来更加简便。而且编译器已经足够智能去把字典中值和类型关联起来(类似脚本语言，赋予值后就会自动声明为该值的类型)。
 
 ```swift
 let myOptions: [NSString: NSObject] = [
@@ -41,47 +41,29 @@ let myOptions: [NSString: NSObject] = [
 ]
 ```
 
-即使在 `Swift` 中，将值传递给 `APIs` 也是一种很不理想的方式 。
+即使在 `Swift` 中将值传递给 `APIs` 也是一种很不理想的方式 。
 
 ###设置字典的特性
 
 下面的列子中展示了设置字典的基础特性，这些特性都是值得仔细研究的。
 
- * They have a fixed set of legal keys. There are about a dozen legal pixel buffer attribute keys in AVFoundation. This collection rarely  changes and those keys are tied to a well-established task.
+ * 他们有一套固定合法的键(`key`)，大概有 `12` 个合法的像素缓冲区属性键在 `AVFoundation` 库里。这个集合里面的键(`key`)很少会被改变，而是用于绑定到一个完善的任务中。
 
- * 他们有一套固定合法的键(`key`)，大概有12个合法的像素缓冲区属性的键在 `AVFoundation` 库里。这个集合里面的键(`key`)很少会被改变，而是用于绑定到一个成熟的任务中。
- 
- * The requested values associated with each key instance are of known types. These types are more nuanced than just NSObject, for example “The number of pixels padding the right of the image (type CFNumber).”
+ * 请求的值关联着每个已知类型键的实例。这些类型相比 `NSObject` 显得更加细致，例如描述“图像右边填充像素的大小（ `CFNumber` 类型）。”
 
- * 与每个键实例关联请求的值是已知的类型。这些类型不仅仅是NSObject的更细致，例如“像素填充图像（类型CFNumber）的权数。”
- 
- * Type safety does matter for the passed values, even though this cannot be enforced through an NSDictionary. Both compatibility keys in the preceding example should be Boolean, not Int or String or Array or even NSNumber.
+ * 类型的安全关系着值的传递，尽管无法通过一个 `NSDictionary` 就可以执行值的传递。前面的例子因为考虑了兼容性，所以键的类型应该是 `Boolean` 类型，而不是 `Int` 或 `String` 或 `Array`，甚至 `NSNumber` 类型。
 
- * 类型的安全关系着值的传递，尽管无法通过一个 `NSDictionary`  就可以执行值的传递。 前面的例子因为考虑了兼容性，所以键的类型应该是 `Boolean` ，而不是 `Int` 或 `String` 或 `Array`，甚至 `NSNumber` 类型。
- 
- * Valid entries appears just once in the dictionary, as keys are hashed and new entries overwrite older ones.
-
- * 有效条目在字典中出现一次就好，因为键是散列的而且新条目将覆盖旧条目。
-
-In Swift, the characteristics in the above bullets list are far more typical of sets and enumerations than dictionaries. Here are some reasons why.
+ * 有效的条目在字典中只会出现一次，键是散列的(哈希)，新条目将会覆盖旧条目。
 
 在 `Swift` 中，上述列出的特性在集合和枚举中显得比字典更加典型。理由如下：
 
- * An enumeration expresses a full range of possible options for a given type. Most Cocoa APIs similar to this example have fixed, unchanging keys.
-
  * 枚举列出了所有给定类型的可能选项。大多数 `Cocoa APIs` 类似于这个例子有固定的，不变的键。
- 
- * Enumerations enable you to associate typed values with individual cases. Cocoa APIs document the types they expect to be passed for each key.
 
- * 枚举使你在个别情况下可以关联键和值。 `Cocoa APIs` 文档表明，他们希望传递的每个键的类型。
- 
- * Like dictionaries, sets restrict membership to avoid multiple instances.
+ * 枚举使你在个别情况下可以关联类型值。 `Cocoa APIs` 文档表明，他们希望通过每个键来传递类型。
 
- * 如字典，集合中有成员限制，以避免多个实例产生。
+ * 像字典一样，集合中有成员的限制以避免多个实例的产生。
 
-For these reasons, I think these settings collections are better expressed in Swift as sets of enumerations instead of an [NSString: NSObject] dictionary.
-
-基于这些原因，我觉得在 `Swift` 中设置集合使用枚举比 `[NSString: NSObject]` 的字典表达的效果更加好。
+基于这些原因，我觉得在 `Swift` 中设置集合时使用枚举会比一个 `[NSString: NSObject]` 的字典表达效果更好。
 
 ###键的转换
 
@@ -113,9 +95,7 @@ enum CVPixelBufferOptions {
 
 重新设计 `options` 为一个可扩展的枚举，每个可能的情况下，严格规定值的类型。这种方法为你提供了一个主要的类型，这种类型相比起 `weak ` 字典类型要显得安全。
 
-In addition, the individual enumeration cases are also clearer, more succinct, and communicate use better than exhaustively long Cocoa constants. Compare these cases with, for example,  kCVPixelBufferCGBitmapContextCompatibilityKey. The Cocoa names take responsibility for mentioning their use as a constant (k), their related class (CVPixelBuffer), and their usage role (key), all of which can be dropped here.
-
-此外，个别枚举情况也更清晰，更简洁，与通信使用比详尽长 `Cocoa` 常量更好。比较这些情况下与例如 `kCVPixelBufferCGBitmapContextCompatibilityKey`。`Cocoa` 称承担责任，提到自己作为一个常数（k）的使用，其相关的类（`CVPixelBuffer`）中，其使用的角色（`key`），所有这一切都可以在这里删除。
+此外，在个别枚举案例也会更清晰，更简洁，使用作为数据交互也比名字很长很详细的 `Cocoa` 常量更好，例如 `kCVPixelBufferCGBitmapContextCompatibilityKey` 这个常量名字就显得非常啰嗦。`Cocoa` 称会承担起提醒其作为一个常数（k）去使用，提醒其关联的类（`CVPixelBuffer`）以及提醒其使用的角色（`key`）的责任，所有的一切都可以在此时避免发生。
 
 ###创建集合的设置
 
@@ -139,8 +119,6 @@ let bufferOptions: [CVPixelBufferOptions] =
 
 数组使用起来是十分友好的，但它却少了独特 `options` 的功能，但是字典是有提供这个功能的，因为这个功能，所以正在推动重新设计数组。
 
-###Differentiating Values
-
 ###区分值
 
 `Hashable` 协议使 `Swift` 可以区分不同的实例。集合和字典都使用了哈希来确保成员和键都是唯一的。如果没有哈希，他们不能提供这些保证。
@@ -156,10 +134,7 @@ let bufferOptions: [CVPixelBufferOptions] =
 
 通过实现哈希，使你能够比较枚举的情况。
 
-###Implementing Hash Values
-
 ###实现哈希值
-
 
 对于这个特定的用例，你需要创建一个哈希函数，该函数只考虑唯一的情况，而不是考虑关联值。目前在 `Swift` 中没有提供此功能的构造函数，所以你需要自己创建这个构造函数。
 
@@ -172,7 +147,7 @@ public func ==(lhs: Self, rhs: Self) -> Bool // equatable
 
 基本的枚举，例如 `MyEnum {case A, B, C}` 提供了原始值，这个原始值告诉你哪些项你正在使用。这些值都是从零开始，并都使用起来十分方便。不幸的是，枚举的关联值不提供原始值的支持，使这项工作变得更加困难。所以，你必须亲手建立哈希值。
 
-下面是 `CVPixelBufferOptions` 的 `extension ` ，它手动为每一种情况增加哈希值。
+下面是 `CVPixelBufferOptions` 的 `extension` ，它手动为每一种情况增加哈希值。
 
 ```swift
 extension CVPixelBufferOptions: 
@@ -197,8 +172,6 @@ public func ==(lhs: CVPixelBufferOptions,
 从最直观的一面可以看出这些哈希值绝对没有任何意义而且也不会暴露给 `API` 使用者，所以如果你需要坚持添加额外的值，你可以这样做。这就是说，这种做法是丑陋，而且让人感觉起来非常不方便。
 
 一旦你添加这些功能，一切都将开始工作。你可以创建集合的设置，来保证每一个集合只出现一次以及保证它们的值关联的是正确的类型。
-
-###Final Thoughts
 
 ###总结
 
