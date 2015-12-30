@@ -10,6 +10,8 @@ Swift语言文章中文版翻译（SwiftGG翻译组）
 
 * Capturing Context[2015-11-06]
 
+* Sets vs Dictionaries smackdown in swiftlang[2015-12-29] 
+
 ## 关于
 
 我们是一群热爱翻译并且热爱 Swift 的人，希望通过自己的努力让不懂英语的程序员也能第一时间学习到国外的先进技术。
