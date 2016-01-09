@@ -15,11 +15,13 @@ permalink:
 
 Here’s a common scenario: You have a table view or collection view that has a variety of different types of content. You want to display varying cells based on these types of content, and they’re all mixed within a single section. Pardon the stand-in art, but it looks roughly like this:
 
-有这一种场景：你有一个 `table view` 或者 `collection view` 
+这是一个常见的场景：你有一个 `table view` 或者 `collection view` 里面含有大量不同种类的内容。你想做到基于不同种类的内容而展示不一样的 `cell` ，这些 `cell` 都是继承于同一个单元（原谅我站在艺术性的角度去设计），它看起来就如下图所示：
 
 ![](http://i4.tietuku.com/53092553e2ff9f43.png) 
 
 In the Objective-C world, it was typical to just use an NSArray to hold whatever records your collection view was going to be using as a data source, and then for each element check what class it is before picking a cell. This case seems particularly not Swifty these days.
+
+在 `Objective-C` 中，最典型就是使用 `NSArray` 来记录 `collection view` 的数据
 
 ```Objective-c
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
