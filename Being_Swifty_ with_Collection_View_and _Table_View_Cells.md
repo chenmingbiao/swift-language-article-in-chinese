@@ -48,8 +48,8 @@ Okay so that’s not the most type-safe approach, although it’s surprisingly c
 
 这不是最类型安全的方法，虽然这种方式在普通的 `Obj-c` 代码中令人惊讶。在 `Swift` 中，有更加好的方式去替换上述问题，那就是使用枚举来为每个项赋予类型，然后进行查找自己所需要的项。让我们看看以下的例子。
 
-###Example
-###例子
+### Example
+### 例子
 
 In an entertainment app I’m working on I’ve got a few types of cells for the types of news items that come in:
 
@@ -65,19 +65,20 @@ enum NewsItem {
 
 The index is just a way to keep track of which item this it supposed to represent in the database. We take this approach to keep the amount of data needed to produce the collection view down. We don’t need all the associated data with every video to be present when putting together a collection view, we just need the info on what cell is tapped, after it is tapped.
 
-该索引只是一个方法来跟踪它应该在数据库中表示的项目。我们采取这种方法，以保持所需的数据的量产生的收集视图。我们不需要所有的相关联的数据，每一个视频是在一起时，收集意见，我们只需要的信息是什么细胞被挖掘，在它被窃听。
-
+索引是一种用来记录该项在数据库中的位置的方法。我们采取这种方法来标识所需数据在 `collection view` 中的展示。这样我们就不需要在同一个 `collection view` 里把数据和视频都放在一起显示了，使得 `cell` 在设置时显得非常灵活。
+ 
 Let’s say we have a simple collection view that shows one of these three and picks a custom cell for each. In a Swift file `NewsFeed.swift` I have that acts as the dataSource of my collection view for the main news view. Of particular interest is the cellForItemAtIndexPath method, which runs the NewsItem record through a switch and produces the correct type of cell, with the relevant information populated:
 
-让我们说，我们有一个简单的集合视图，显示了这三个，并为每个选择一个自定义单元格。在名为`NewsFeed.swift` 的 `Swift` 文件中作为主要的新闻观我的集合视图的数据源。特别感兴趣的是 `cellforitematindexpath` 方法，它运行的 `newsitem` 记录通过开关和产生细胞正确的类型，与相关信息密集：
+我们有一个简单的 `collection view` 为每一个 `cell` 都自定义。名为 `NewsFeed.swift` 文件作为 `collection view` 的新闻视图(`view`)的主要数据源。特别感兴趣的是 `cellForItemAtIndexPath` 方法，它通过 `NewsItem` 枚举记录通过开关和产生 `cell` 正确的类型，与相关信息密集：
 
 ```swift
 func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+
     let record = records[indexPath.row]
  
     switch(record) {
  
-    case .Playthrough(let index):
+    case .Playthrough(let index): 
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PlaythroughCell", forIndexPath: indexPath) as! PlaythroughCollectionViewCell
         let playthrough = MediaDB.playthroughAtIndex(index)
         cell.titleLabel.text = playthrough.title
@@ -103,7 +104,7 @@ func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath ind
 
 This code works well enough, record is of type `NewsItem` which can be one of three cases for the different news items we support:
 
-这个代码的好作品，记录类型是 `newsitem` 可以为不同的新闻我们支持三例一：
+上面的代码可以清晰看出，`record` 可以表示为 `NewsItem` 枚举里面三个 `case` 中任意一个：
 
 ```swift
 enum NewsItem {
@@ -123,11 +124,11 @@ Something about this code didn’t sit right with me though. I felt that too muc
 
 But what if I created a protocol for any data source that could be presented as a collection view cell? It would change on a view-by-view basis so I don’t actually want this in my model.. but I do like having it on these particular CollectionViewCell subclasses.
 
-但是，如果我创建了一个协议的任何数据源，可以作为一个集合视图单元？它会改变一个视图的基础上，所以我不希望这在我的模型中。但我确实喜欢在这些特殊的 `collectionviewcell` 子类。
+但是，如果我创建了一个用于任何数据源的协议，它可以用在 `collection view cell` 吗？它会改变一个视图的基础上，所以我不希望这在我的模型中。但我确实喜欢在这些特殊的 `CollectionViewCell` 子类。
 
 So, I created a protocol called NewsCellPresentable, which I can adhere to in extensions with my custom collection view cells:
 
-所以，我创建了一个叫做 `newscellpresentable` 协议，我可以坚持我的自定义集合视图单元格扩展：
+所以，我创建了一个叫做 `NewsCellPresentable` 协议，这个协议被自定义 `collection view` 的 `cells` 拓展所继承：
 
 ```swift
 protocol NewsCellPresentable {
@@ -157,9 +158,7 @@ extension TrailerCollectionViewCell: NewsCellPresentable {
 }
 ```
 
-This feels much cleaner already. Now I can go back to my cellForItemAtIndexPath method and trim it down to just the following:
-
-这感觉已经很干净了。现在我可以回到我的 `cellforitematindexpath` 方法和修剪下来的下面：
+这样写看起来已经很简洁明了了。现在我们回到 `cellForItemAtIndexPath` 方法中对代码进行修改，修改后如下所示：
 
 ```swift
 func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -185,15 +184,13 @@ func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath ind
 }
 ```
 
-What do you think? Is this a cleaner approach? Let me know if you have a different method in the comment, or `let me know` on `Twitter`. My username is `@jquave`.
-
-你觉得怎么样？这是一个清洁的方法吗？让我知道，如果你有一个不同的方法在评论，或“让我知道”在“推特”。我的用户名是 `@ jquave` 。
+你觉得这种方法怎么样？这是一种简洁的方法吗？如果你有其它不同的实现方法，可以在文章下面留言给我，我们可以一起交流，或者使用 `Twitter` 中 `let me know` 功能，我的用户名是 `@jquave` 。
 
 ###P.S.
 
 If you want to try this out yourself and don’t have the same DB layer as me… guess what? Neither do I! You can easily stub this out like this:
 
-如果你想尝试一下自己，不要和我一样有相同的分贝……你猜怎么着？我也不！你可以很容易地这样的存根：
+如果你没有 `DB` 层代码，但又想写出和我例子一样的实例，你可以参照下列代码：
 
 ```swift
 class MediaDB {
@@ -236,4 +233,4 @@ enum NewsItem {
 
 Personally I always stub things out with static values before I do the work of integrating with a backend service or whatever data provider is needed. This makes it much easier to iterate.
 
-就个人而言，我总是在做与后端服务集成的工作，或者需要任何数据提供程序的工作之前，总会在静态的值上短的东西。这使得它更容易进行。
+就个人而言，我总是在做与后端服务集成的工作，或者需要任何数据提供程序的工作之前，总会在静态的值上短的东西。这使得它更容易迭代。
