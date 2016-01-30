@@ -8,10 +8,9 @@ permalink: sets-vs-dictionaries-smackdown-in-swiftlang
 > 作者：Erica Sadun，[原文链接](http://ericasadun.com/2015/10/19/sets-vs-dictionaries-smackdown-in-swiftlang/)，原文日期：2015-10-19
 > 译者：[CMB](https://github.com/chenmingbiao)；校对：[Cee](https://github.com/Cee)；定稿：[千叶知风](http://weibo.com/xiaoxxiao)
 
-
 <!--此处开始正文-->
 
-传统的 `Cocoa` 在使用字典时有个不好的习惯。无论是用户信息还是字体选项亦或是视频流（AVFundation）设置，`NSDictionary` 一直担任 `Cocoa` 传递数据的角色。字典是灵活的、易用的，但它也存在诸多潜在的危险。
+传统的 `Cocoa` 在使用字典时有个不好的习惯。无论是用户信息还是字体选项亦或是视频流（AVFoundation）设置，`NSDictionary` 一直担任 `Cocoa` 传递数据的角色。字典是灵活的、易用的，但它也存在诸多潜在的危险。
 
 在这篇文章中，我将讨论另一种更加 Swift 化的方法。这并不是一个能够彻底解决问题的方法，但我认为它是一个在后 Swift 时代中能够更好展示 API 是如何工作的观念模式。
 

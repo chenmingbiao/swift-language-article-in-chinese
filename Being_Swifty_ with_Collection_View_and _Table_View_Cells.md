@@ -1,25 +1,19 @@
-title: "collectionView 和 tableView cells 的快捷方式"
+title: "更加快捷地使用 collectionView 和 tableView cells"
 date: 2016-01-05 16:11:00
 tags: [AppCoda]
-categories: []
+categories: [Swift 进阶]
 permalink: 
 
 ---
-原文链接=http://jamesonquave.com/blog/being-swifty-with-collection-view-and-table-view-cells/
-作者=Jameson Quave
-原文日期=2015/12/28
-译者=CMB
-校对=
-定稿=
-发布时间=
+> 作者：Jameson Quave，[原文链接](http://jamesonquave.com/blog/being-swifty-with-collection-view-and-table-view-cells/)，原文日期：2015-12-28
+> 译者：[CMB](https://github.com/chenmingbiao)；校对：[XXX]()；定稿：[XXX]()
 
-Here’s a common scenario: You have a table view or collection view that has a variety of different types of content. You want to display varying cells based on these types of content, and they’re all mixed within a single section. Pardon the stand-in art, but it looks roughly like this:
 
-这是一个常见的场景：你有一个 `table view` 或者 `collection view` 里面含有大量不同种类的内容。你想做到基于不同种类的内容而展示不一样的 `cell` ，这些 `cell` 都是继承于同一个单元（原谅我站在艺术性的角度去设计），它看起来就如下图所示：
+<!--此处开始正文-->
+
+这是一个常见的场景：你有一个 `table view` 或者 `collection view` 里面含有大量不同种类的内容。你想做到基于不同种类的内容而展示不一样的 `cell` ，而且这些 `cell` 都混合在同一个部件里（原谅我站在艺术的角度去设计），它看起来就如下图所示：
 
 ![](http://i4.tietuku.com/53092553e2ff9f43.png) 
-
-In the Objective-C world, it was typical to just use an NSArray to hold whatever records your collection view was going to be using as a data source, and then for each element check what class it is before picking a cell. This case seems particularly not Swifty these days.
 
 在 `Objective-C` 中，最典型就是使用 `NSArray` 来记录 `collection view` 的数据源，然后通过对比每个数据源的类型后再对 `cell` 进行操作，现在看来这种方式是特别不方便的。
 
@@ -44,16 +38,11 @@ In the Objective-C world, it was typical to just use an NSArray to hold whatever
 }
 ```
 
-Okay so that’s not the most type-safe approach, although it’s surprisingly common in Obj-C iOS code. As a better alternative in Swift, we can use enum cases for the different item types, and perform lookups of the items themeselves as needed. Let’s look at an example.
+这不是最安全的方法，但是在 `Obj-c` 中使用这种方法仍然会令人感觉惊讶。在 `Swift` 中，有更加好的方式去替换上述问题，那就是使用枚举的 `case` 来为不同类型的项做标识，然后通过这些 `case` 就可以找到我们所需要的项。让我们看看下面的例子。
 
-这不是最类型安全的方法，虽然这种方式在普通的 `Obj-c` 代码中令人惊讶。在 `Swift` 中，有更加好的方式去替换上述问题，那就是使用枚举来为每个项赋予类型，然后进行查找自己所需要的项。让我们看看以下的例子。
-
-### Example
 ### 例子
 
-In an entertainment app I’m working on I’ve got a few types of cells for the types of news items that come in:
-
-在一个我正在写的娱乐App里，我有一些不同新闻类型的 `cell` :
+一个我正在写的娱乐 App 里，需要一些不同新闻类型的 `cell` :
 
 ```swift
 enum NewsItem {
@@ -63,13 +52,9 @@ enum NewsItem {
 }
 ```
 
-The index is just a way to keep track of which item this it supposed to represent in the database. We take this approach to keep the amount of data needed to produce the collection view down. We don’t need all the associated data with every video to be present when putting together a collection view, we just need the info on what cell is tapped, after it is tapped.
+索引是一种用来记录数据在数据库中位置的方法。我们采取这种索引的方法来标识所需数据在 `collection view` 中的展示。这样我们就不需要把每一个数据和视频都放在同一个 `collection view` 里，使得 `cell` 在设置时显得非常灵活。
 
-索引是一种用来记录该项在数据库中的位置的方法。我们采取这种方法来标识所需数据在 `collection view` 中的展示。这样我们就不需要在同一个 `collection view` 里把数据和视频都放在一起显示了，使得 `cell` 在设置时显得非常灵活。
- 
-Let’s say we have a simple collection view that shows one of these three and picks a custom cell for each. In a Swift file `NewsFeed.swift` I have that acts as the dataSource of my collection view for the main news view. Of particular interest is the cellForItemAtIndexPath method, which runs the NewsItem record through a switch and produces the correct type of cell, with the relevant information populated:
-
-我们有一个简单的 `collection view` 为每一个 `cell` 都自定义。名为 `NewsFeed.swift` 文件作为 `collection view` 的新闻视图(`view`)的主要数据源。特别感兴趣的是 `cellForItemAtIndexPath` 方法，它通过 `NewsItem` 枚举记录通过开关和产生 `cell` 正确的类型，与相关信息密集：
+我们有一个简单的 `collection view` ，它里面含有三个自定义的 `cell` 。我使用 `NewsFeed.swift` 文件作为这个新闻 `collection view` 的主要数据源。我特别感兴趣的是 `cellForItemAtIndexPath` 方法，通过 `NewsItem` 枚举来区分 `record` 的类型，从而产生相对应的 `cell` ：
 
 ```swift
 func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -102,9 +87,7 @@ func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath ind
 }
 ```
 
-This code works well enough, record is of type `NewsItem` which can be one of three cases for the different news items we support:
-
-上面的代码可以清晰看出，`record` 可以表示为 `NewsItem` 枚举里面三个 `case` 中任意一个：
+上面的代码可以清晰看出，`record` 可以表示为 `NewsItem` 枚举里三个 `case` 中任意一个：
 
 ```swift
 enum NewsItem {
@@ -114,21 +97,13 @@ enum NewsItem {
 }
 ```
 
-The associated index value is so that we can find the individual item in the DB when the collection view wants to display a cell.
+当我们想在 `collection view` 中展示一个 `cell` 的时候，我们可以通过相关的索引值去找到 `DB` 中对应的那一项。
 
-相关的索引值是这样，当收集视图要显示单元格时，我们可以在数据库中找到单独的项。
+这段代码让我觉得很不舒服。有许多重复代码，尤其是 `switch` ，非常笨重，每个 `case` 都做了太多事情。
 
-Something about this code didn’t sit right with me though. I felt that too much of the code was boilerplate; in particular the switch felt bulky and like it had too much work being done inside each case.
+但是，如果我创建了一个用于任何数据源的协议，它可以用在 `collection view cell` 吗？鉴于每个基础视图( `view` )都需要改变，所以我不希望在模型( `model` )中使用。但我喜欢在这些特殊的 `CollectionViewCell` 的子类上使用它。
 
-关于这个代码的东西没有坐在我的右边。我觉得太多的代码模板；特别是开关感觉笨重，好像在每一种情况下所做的工作太多了。
-
-But what if I created a protocol for any data source that could be presented as a collection view cell? It would change on a view-by-view basis so I don’t actually want this in my model.. but I do like having it on these particular CollectionViewCell subclasses.
-
-但是，如果我创建了一个用于任何数据源的协议，它可以用在 `collection view cell` 吗？它会改变一个视图的基础上，所以我不希望这在我的模型中。但我确实喜欢在这些特殊的 `CollectionViewCell` 子类。
-
-So, I created a protocol called NewsCellPresentable, which I can adhere to in extensions with my custom collection view cells:
-
-所以，我创建了一个叫做 `NewsCellPresentable` 协议，这个协议被自定义 `collection view` 的 `cells` 拓展所继承：
+所以，我创建了一个叫做 `NewsCellPresentable` 协议，这个协议被自定义 `collection view cells` 扩展( `extensions` )所继承：
 
 ```swift
 protocol NewsCellPresentable {
@@ -184,11 +159,9 @@ func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath ind
 }
 ```
 
-你觉得这种方法怎么样？这是一种简洁的方法吗？如果你有其它不同的实现方法，可以在文章下面留言给我，我们可以一起交流，或者使用 `Twitter` 中 `let me know` 功能，我的用户名是 `@jquave` 。
+你觉得这种方法怎么样？这是一种简洁的方法吗？如果你有其它不同的实现方法，可以直接在文章下面留言给我，或者使用 `Twitter` 中 `let me know` 模块留言给我，我的用户名是 `@jquave`，希望可以一起交流学习。
 
-###P.S.
-
-If you want to try this out yourself and don’t have the same DB layer as me… guess what? Neither do I! You can easily stub this out like this:
+### 附言
 
 如果你没有 `DB` 层代码，但又想写出和我例子一样的实例，你可以参照下列代码：
 
@@ -231,6 +204,4 @@ enum NewsItem {
 }
 ```
 
-Personally I always stub things out with static values before I do the work of integrating with a backend service or whatever data provider is needed. This makes it much easier to iterate.
-
-就个人而言，我总是在做与后端服务集成的工作，或者需要任何数据提供程序的工作之前，总会在静态的值上短的东西。这使得它更容易迭代。
+就个人而言，在写后端服务和接口之前，我总会做静态值的存根。这样会使得项目更容易迭代。
