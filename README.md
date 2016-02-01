@@ -4,15 +4,15 @@ Swift语言文章中文版翻译（SwiftGG翻译组）
 
 ## 列表
 
-* [Cryptography in Swift with CommonCrypto [2015-08-29]](https://github.com/chenmingbiao/swift-language-article-in-chinese/cryptography_in_swift_with_commoncrypto.md)
+* [Cryptography in Swift with CommonCrypto [2015-08-29]](https://github.com/chenmingbiao/swift-language-article-in-chinese/blob/master/cryptography_in_swift_with_commoncrypto.md)
 
-* [Templates in Xcode 6[2015-09-13]](https://github.com/chenmingbiao/swift-language-article-in-chinese/templates_in_xcode_6.md)
+* [Templates in Xcode 6[2015-09-13]](https://github.com/chenmingbiao/swift-language-article-in-chinese/blob/master/templates_in_xcode_6.md)
 
-* [Capturing Context[2015-11-06]](https://github.com/chenmingbiao/swift-language-article-in-chinese/capturing_context.md)
+* [Capturing Context[2015-11-06]](https://github.com/chenmingbiao/swift-language-article-in-chinese/blob/master/capturing_context.md)
 
-* [Sets vs Dictionaries smackdown in swiftlang[2015-12-29]](https://github.com/chenmingbiao/swift-language-article-in-chinese/sets_vs_dictionaries_smackdown_in_swiftlang.md)
+* [Sets vs Dictionaries smackdown in swiftlang[2015-12-29]](https://github.com/chenmingbiao/swift-language-article-in-chinese/blob/master/sets_vs_dictionaries_smackdown_in_swiftlang.md)
 
-* [Being Swifty with Collection View and Table View Cells[2016-01-24]](https://github.com/chenmingbiao/swift-language-article-in-chinese/being_swifty_with_collection_view_and_table_view_cells.md)
+* [Being Swifty with Collection View and Table View Cells[2016-01-24]](https://github.com/chenmingbiao/swift-language-article-in-chinese/blob/master/being_swifty_with_collection_view_and_table_view_cells.md)
 
 ## 关于
 
