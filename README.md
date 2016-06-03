@@ -14,6 +14,8 @@ Swift语言文章中文版翻译（SwiftGG翻译组）
 
 * [Being Swifty with Collection View and Table View Cells[2016-01-24]](https://github.com/chenmingbiao/swift-language-article-in-chinese/blob/master/being_swifty_with_collection_view_and_table_view_cells.md)
 
+* [Auto Defaulting Objc Arguments[2016-05-09]](https://github.com/chenmingbiao/swift-language-article-in-chinese/blob/master/auto_defaulting_objc_arguments.md)
+
 ## 关于
 
 我们是一群热爱翻译并且热爱 Swift 的人，希望通过自己的努力让不懂英语的程序员也能第一时间学习到国外的先进技术。
